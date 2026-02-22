@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Special One 🤍</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #FFFBF8;
+            --text-dark: #5D5D5D;
+            --accent: #FFB5B5;
+            --accent-hover: #ff9e9e;
+            --soft-blue: #DDF0F3;
+            --soft-yellow: #FFF5D1;
+            --soft-purple: #EFE4F5;
+            --soft-green: #E2F0D9;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0; font-family: 'Prompt', sans-serif;
+            background: linear-gradient(135deg, var(--bg-main) 0%, #FFF0EC 100%);
+            color: var(--text-dark);
+            height: 100vh; overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- Transitions & Animations --- */
+        .page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Page: Lock Screen --- */
+        #lock-screen { display: flex; z-index: 100; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); }
+        .cat-bg { position: absolute; width: 100%; height: 100%; opacity: 0.12; pointer-events: none; overflow: hidden; z-index: -1;}
+        .cat-row { 
+            position: absolute; width: 200%; height: 80px; bottom: 15%; 
+            animation: moveCat 25s linear infinite;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' width='64'%3E%3Cpath fill='%23555' d='M42 28c-2-2-5-3-8-3-4 0-7 2-9 5-3 4-4 9-3 14l1 3c1 3 4 5 7 5h12c3 0 6-2 7-5l1-3c1-5 0-10-3-14-2-3-5-5-8-5z'/%3E%3Cpath fill='none' stroke='%23555' stroke-width='2' d='M34 25v-4c0-3-2-5-5-5h-4c-3 0-5 2-5 5v4M50 25v-4c0-3 2-5 5-5h4c3 0 5 2 5 5v4'/%3E%3C/svg%3E");
+        }
+        @keyframes moveCat { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        .lock-box { 
+            background: rgba(255, 255, 255, 0.85); padding: 40px 35px; 
+            border-radius: 40px; box-shadow: 0 15px 35px rgba(255, 181, 181, 0.2); 
+            text-align: center; border: 2px solid white;
+        }
+        .pass-hint { font-size: 0.85rem; color: #999; margin-top: 5px; transition: 0.3s; }
+        
+        /* Shake Animation for Wrong Passcode */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake { animation: shake 0.4s ease-in-out; color: #ff6b6b !important; font-weight: 500; }
+
+        .dots { display: flex; gap: 15px; margin: 25px 0 35px 0; justify-content: center; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; background: #E5E5E5; transition: 0.2s; }
+        .dot.active { background: var(--accent); transform: scale(1.2); box-shadow: 0 0 8px var(--accent); }
+        
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+        .btn-n { 
+            width: 65px; height: 65px; border-radius: 50%; border: none; 
+            font-size: 1.4rem; font-family: 'Prompt'; font-weight: 500; color: var(--text-dark);
+            cursor: pointer; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-n:active { transform: scale(0.9); background: #f8f8f8; }
+
+        /* --- Page: Big Heart --- */
+        #heart-page { z-index: 90; background: #fffcf9; }
+        .big-heart { font-size: 8rem; cursor: pointer; animation: heartbeat 1.2s infinite; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .heart-hint { margin-top: 20px; font-size: 1.2rem; color: var(--accent); font-weight: 500; animation: bounce 2s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.15); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-15px); } 60% { transform: translateY(-7px); } }
+
+        /* --- Page: Main Menu UI --- */
+        #menu-page { z-index: 80; background: var(--bg-main); }
+        .menu-title { margin-bottom: 35px; font-weight: 500; font-size: 1.6rem; color: #444; }
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 0 20px; max-width: 400px; width: 100%; }
+        .menu-item { 
+            aspect-ratio: 1; border-radius: 30px; border: none; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: 'Prompt'; font-size: 1rem; font-weight: 500; color: #555; gap: 12px; 
+            transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .menu-item span { font-size: 2.2rem; }
+        .menu-item:hover, .menu-item:active { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 25px rgba(0,0,0,0.08); }
+        .m1 { background: var(--soft-blue); } .m2 { background: var(--soft-green); }
+        .m3 { background: var(--soft-yellow); } .m4 { background: var(--soft-purple); }
+
+        /* --- Sub Pages Content --- */
+        .back-btn { 
+            position: fixed; top: 30px; left: 20px; background: white; border: none; 
+            padding: 10px 20px; border-radius: 30px; cursor: pointer; font-family: 'Prompt'; font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06); transition: 0.2s; z-index: 1000;
+        }
+        .back-btn:active { transform: scale(0.95); }
+        
+        /* UI 1: Calendar */
+        #ui-1 { background: #f2f9f9; }
+        .calendar-card { 
+            background: white; padding: 40px; border-radius: 30px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.06); text-align: center;
+            width: 80%; max-width: 320px; position: relative;
+        }
+        .calendar-card::before {
+            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 30px; background: #eee; border-radius: 15px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .cal-month { color: #ff6b6b; font-weight: 600; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px;}
+        .cal-day { font-size: 6.5rem; font-weight: 600; line-height: 1; margin: 10px 0; color: #333; }
+        
+        /* UI 2: Vine (เถาวัลย์) */
+        #ui-2 { background: #f7fbf6; }
+        .vine-container { position: relative; width: 100%; height: 70%; max-width: 400px; margin-top: 80px;}
+        .paper { 
+            background: #fff; padding: 15px 20px; width: 140px; position: absolute; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-radius: 10px;
+            font-size: 0.95rem; text-align: center; line-height: 1.4;
+            animation: floatNote 4s ease-in-out infinite alternate;
+        }
+        .paper::before { 
+            content: '📍'; position: absolute; top: -12px; left: 50%; 
+            transform: translateX(-50%); font-size: 1.2rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+        }
+        @keyframes floatNote {
+            0% { transform: translateY(0) rotate(var(--rot)); }
+            100% { transform: translateY(-12px) rotate(calc(var(--rot) + 2deg)); }
+        }
+
+        /* UI 3: Photo Album */
+        #ui-3 { background: #FAF9F6; overflow-y: auto; display: block; padding: 100px 20px 40px 20px; }
+        .photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 500px; margin: 0 auto; }
+        .photo-grid img { 
+            width: 100%; height: 160px; object-fit: cover; border-radius: 15px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: #eee;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* UI 4: Info Boxes */
+        #ui-4 { background: var(--bg-main); overflow-y: auto; display: block; padding: 100px 20px 40px 20px; }
+        .info-container { display: flex; flex-direction: column; gap: 18px; max-width: 500px; margin: 0 auto; }
+        .info-box { 
+            background: white; border-radius: 20px; padding: 18px; 
+            display: flex; align-items: center; gap: 18px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03); transition: 0.3s;
+        }
+        .info-box:hover { transform: translateX(5px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+        .info-img { 
+            width: 65px; height: 65px; border-radius: 15px; background: #ffe4e4; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+            object-fit: cover; flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="lock-screen" class="page" style="display: flex;">
+        <div class="cat-bg"><div class="cat-row"></div></div>
+        <div class="lock-box">
+            <div style="font-size: 1.2rem; font-weight: 500; margin-bottom: 5px;">Enter Passcode</div>
+            <div id="pass-msg" class="pass-hint">ครบรอบของเรา (140269)</div>
+            <div class="dots" id="pass-dots">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <div class="numpad">
+                <button class="btn-n" onclick="addNum('1')">1</button>
+                <button class="btn-n" onclick="addNum('2')">2</button>
+                <button class="btn-n" onclick="addNum('3')">3</button>
+                <button class="btn-n" onclick="addNum('4')">4</button>
+                <button class="btn-n" onclick="addNum('5')">5</button>
+                <button class="btn-n" onclick="addNum('6')">6</button>
+                <button class="btn-n" onclick="addNum('7')">7</button>
+                <button class="btn-n" onclick="addNum('8')">8</button>
+                <button class="btn-n" onclick="addNum('9')">9</button>
+                <div></div> <button class="btn-n" onclick="addNum('0')">0</button>
+                <button class="btn-n" onclick="delNum()" style="background: transparent; box-shadow: none; font-size: 1.8rem;">⌫</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="heart-page" class="page">
+        <div class="big-heart" onclick="goToMenu()">💖</div>
+        <div class="heart-hint">กดที่หัวใจสิคะ!!</div>
+    </div>
+
+    <div id="menu-page" class="page">
+        <div class="menu-title">เลือกดูสิคะคนเก่ง ✨</div>
+        <div class="menu-grid">
+            <button class="menu-item m1" onclick="showUI('ui-1')"><span>📅</span>วันนี้วันอะไร</button>
+            <button class="menu-item m2" onclick="showUI('ui-2')"><span>🌿</span>คำอวยพร</button>
+            <button class="menu-item m3" onclick="showUI('ui-3')"><span>📸</span>ความทรงจำ</button>
+            <button class="menu-item m4" onclick="showUI('ui-4')"><span>💌</span>ข้อความ</button>
+        </div>
+    </div>
+
+    <div id="ui-1" class="page">
+        <button class="back-btn" onclick="showUI('menu-page')">← กลับ</button>
+        <div class="calendar-card">
+            <div class="cal-month">กุมภาพันธ์</div>
+            <div class="cal-day">23</div>
+            <div style="letter-spacing: 5px; color: #999; font-weight: 500;">2569</div>
+            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed #ddd;">
+                <p style="margin: 0; font-size: 1.1rem; color: var(--accent); font-weight: 500;">วันเกิดสุดพิเศษของเธอ 🎂</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #777;">ขอให้มีความสุขมากๆ นะคะ</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="ui-2" class="page">
+        <button class="back-btn" onclick="showUI('menu-page')">← กลับ</button>
+        <div style="font-size: 1.3rem; font-weight: 500; color: #698F69; margin-top: 20px;">เถาวัลย์แห่งความรัก 🌿</div>
+        <div class="vine-container">
+            <div class="paper" style="top: 10%; left: 10%; --rot: -8deg; animation-delay: 0s;">มีความสุขมากๆ นะคะ</div>
+            <div class="paper" style="top: 30%; right: 10%; --rot: 6deg; animation-delay: 1s;">รักที่สุดเลย 💕</div>
+            <div class="paper" style="top: 55%; left: 15%; --rot: -4deg; animation-delay: 0.5s;">คนเก่งของเค้า ยิ้มเยอะๆ นะ</div>
+            <div class="paper" style="top: 75%; right: 15%; --rot: 5deg; animation-delay: 1.5s;">อยู่เป็นรอยยิ้ม<br>ให้กันไปนานๆ นะ</div>
+        </div>
+    </div>
+
+    <div id="ui-3" class="page">
+        <button class="back-btn" onclick="showUI('menu-page')">← กลับ</button>
+        <div class="photo-grid">
+            <img src="https://picsum.photos/seed/love1/300/400" alt="Photo 1" style="animation-delay: 0.1s">
+            <img src="https://picsum.photos/seed/love2/300/400" alt="Photo 2" style="animation-delay: 0.2s">
+            <img src="https://picsum.photos/seed/love3/300/400" alt="Photo 3" style="animation-delay: 0.3s">
+            <img src="https://picsum.photos/seed/love4/300/400" alt="Photo 4" style="animation-delay: 0.4s">
+            <img src="https://picsum.photos/seed/love5/300/400" alt="Photo 5" style="animation-delay: 0.5s">
+            <img src="https://picsum.photos/seed/love6/300/400" alt="Photo 6" style="animation-delay: 0.6s">
+            <img src="https://picsum.photos/seed/love7/300/400" alt="Photo 7" style="animation-delay: 0.7s">
+            <img src="https://picsum.photos/seed/love8/300/400" alt="Photo 8" style="animation-delay: 0.8s">
+        </div>
+    </div>
+
+    <div id="ui-4" class="page">
+        <button class="back-btn" onclick="showUI('menu-page')">← กลับ</button>
+        <div class="info-container">
+            <div class="info-box">
+                <div class="info-img">🥰</div>
+                <div>
+                    <div style="font-weight: 500; font-size: 1.1rem; color: #444;">ถึง.. เจ้าของวันเกิด</div>
+                    <div style="font-size: 0.85rem; color: #777; margin-top: 4px;">วันนี้เป็นวันที่โลกสดใสที่สุดเลย</div>
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-img" style="background:#fff3cd;">🌟</div>
+                <div>
+                    <div style="font-weight: 500; font-size: 1.1rem; color: #444;">ขอบคุณนะ</div>
+                    <div style="font-size: 0.85rem; color: #777; margin-top: 4px;">ขอบคุณที่เกิดมาให้รักนะคะ</div>
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-img" style="background:#d4edda;">🎁</div>
+                <div>
+                    <div style="font-weight: 500; font-size: 1.1rem; color: #444;">ของขวัญ</div>
+                    <div style="font-size: 0.85rem; color: #777; margin-top: 4px;">ไม่มีอะไรให้นอกจากหัวใจดวงนี้ ฮิ้วว</div>
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-img" style="background:#d1ecf1;">🌈</div>
+                <div>
+                    <div style="font-weight: 500; font-size: 1.1rem; color: #444;">คำสัญญา</div>
+                    <div style="font-size: 0.85rem; color: #777; margin-top: 4px;">จะดูแลอย่างดี ไม่ดื้อ ไม่ซน (มั้ง)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pass = "140269";
+        let input = "";
+        const dots = document.querySelectorAll('.dot');
+        const passMsg = document.getElementById('pass-msg');
+        const music = document.getElementById('bgMusic');
+
+        function addNum(n) {
+            if (input.length < 6) {
+                input += n;
+                updateDots();
+                
+                // ถ้ารหัสครบ 6 ตัว
+                if (input.length === 6) {
+                    setTimeout(() => {
+                        if (input === pass) {
+                            // รหัสถูก
+                            music.play().catch(e => console.log("รอให้ผู้ใช้ interact ก่อนเล่นเพลง")); 
+                            showUI('heart-page');
+                        } else {
+                            // รหัสผิด (ทำแอนิเมชันสั่น)
+                            passMsg.textContent = "รหัสไม่ถูกต้องน้า ลองใหม่ๆ 🥺";
+                            passMsg.classList.add('shake');
+                            
+                            // รีเซ็ตหลังจากสั่นเสร็จ
+                            setTimeout(() => {
+                                input = "";
+                                updateDots();
+                                passMsg.classList.remove('shake');
+                                passMsg.textContent = "ครบรอบของเรา (140269)";
+                            }, 800);
+                        }
+                    }, 200); // ดีเลย์นิดนึงให้จุดที่ 6 แสดงขึ้นมาก่อน
+                }
+            }
+        }
+
+        function delNum() { 
+            input = input.slice(0, -1); 
+            updateDots(); 
+        }
+
+        function updateDots() {
+            dots.forEach((d, i) => {
+                if(i < input.length) {
+                    d.classList.add('active');
+                } else {
+                    d.classList.remove('active');
+                }
+            });
+        }
+
+        function showUI(id) {
+            // ซ่อนทุกหน้า
+            document.querySelectorAll('.page').forEach(p => {
+                p.style.display = 'none';
+            });
+            // โชว์หน้าที่เลือก
+            const target = document.getElementById(id);
+            // ui-3 และ ui-4 ต้องใช้ block เพื่อให้ scroll ได้
+            target.style.display = (id === 'ui-3' || id === 'ui-4') ? 'block' : 'flex';
+            
+            // รีเซ็ตแอนิเมชัน (เพื่อให้เด้งใหม่ทุกครั้งที่เปิดหน้า)
+            target.style.animation = 'none';
+            target.offsetHeight; /* trigger reflow */
+            target.style.animation = null; 
+        }
+
+        function goToMenu() {
+            showUI('menu-page');
+        }
+    </script>
+</body>
+</html>
